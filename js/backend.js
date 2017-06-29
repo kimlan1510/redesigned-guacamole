@@ -36,7 +36,7 @@ Bike.prototype.getBikes = function(manufacturer, color, location, distance, stol
     stringDist = "";
   }
 
-  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=5" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike")
+  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike")
   .then(function(response){
     var bikes = response.bikes;
     bikes.forEach(function(element){
@@ -64,7 +64,7 @@ Bike.prototype.getBikeLocation = function(manufacturer, color, location, distanc
     stringDist = "";
   }
 
-  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=stolen" + "&access_token=bike")
+  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike")
   .then(function(response){
     var bikes = response.bikes;
     var locations = [];
@@ -72,6 +72,35 @@ Bike.prototype.getBikeLocation = function(manufacturer, color, location, distanc
       locations.push(element.stolen_location);
     });
     getLocation(locations);
+  })
+  .fail(function(error){
+    $("#display").text("No such thing");
+  });
+};
+
+Bike.prototype.displayHeatMap = function(manufacturer, color, location, distance, stolenness, heatMap) {
+  var stringManu = "&manufacturer=";
+  var stringColor = "&colors=";
+  var stringLoc = "&location=";
+  var stringDist = "&distance=";
+  if(manufacturer == ""){
+    stringManu = "";
+  } if(color == ""){
+    stringColor = "";
+  } if(location == ""){
+    stringLoc = "";
+  } if(distance == ""){
+    stringDist = "";
+  }
+
+  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike")
+  .then(function(response){
+    var bikes = response.bikes;
+    var locations = [];
+    bikes.forEach(function(element){
+      locations.push(element.stolen_location);
+    });
+    heatMap(locations);
   })
   .fail(function(error){
     $("#display").text("No such thing");

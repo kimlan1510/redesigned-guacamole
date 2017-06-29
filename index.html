@@ -29,6 +29,7 @@
         </select>
         </br>
         <button type="submit" name="button">got it</button>
+        <button id="heatmap" type="button" name="button">heat map</button>
       </form>
       <div id="map"></div>
 
@@ -41,14 +42,10 @@
           center: portland,
           mapTypeId: "terrain"
         });
-        var marker = new google.maps.Marker({
-          position: portland,
-          map: map
-        });
       }
       </script>
       <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBd7LtLq6fnqKfK8p3YmWAOnKxTIO6SXtU&callback=initMap">
+      src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&key=AIzaSyBd7LtLq6fnqKfK8p3YmWAOnKxTIO6SXtU&callback=initMap">
       </script>
     </div>
   </body>

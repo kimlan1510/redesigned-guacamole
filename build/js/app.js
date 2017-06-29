@@ -37,7 +37,7 @@ Bike.prototype.getBikes = function(manufacturer, color, location, distance, stol
     stringDist = "";
   }
 
-  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=5" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike")
+  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike")
   .then(function(response){
     var bikes = response.bikes;
     bikes.forEach(function(element){
@@ -65,7 +65,7 @@ Bike.prototype.getBikeLocation = function(manufacturer, color, location, distanc
     stringDist = "";
   }
 
-  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=stolen" + "&access_token=bike")
+  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike")
   .then(function(response){
     var bikes = response.bikes;
     var locations = [];
@@ -73,6 +73,35 @@ Bike.prototype.getBikeLocation = function(manufacturer, color, location, distanc
       locations.push(element.stolen_location);
     });
     getLocation(locations);
+  })
+  .fail(function(error){
+    $("#display").text("No such thing");
+  });
+};
+
+Bike.prototype.displayHeatMap = function(manufacturer, color, location, distance, stolenness, heatMap) {
+  var stringManu = "&manufacturer=";
+  var stringColor = "&colors=";
+  var stringLoc = "&location=";
+  var stringDist = "&distance=";
+  if(manufacturer == ""){
+    stringManu = "";
+  } if(color == ""){
+    stringColor = "";
+  } if(location == ""){
+    stringLoc = "";
+  } if(distance == ""){
+    stringDist = "";
+  }
+
+  $.get("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike")
+  .then(function(response){
+    var bikes = response.bikes;
+    var locations = [];
+    bikes.forEach(function(element){
+      locations.push(element.stolen_location);
+    });
+    heatMap(locations);
   })
   .fail(function(error){
     $("#display").text("No such thing");
@@ -106,18 +135,34 @@ $(document).ready(function(){
 
 });
 
-var getLocation = function(location){
+var map;
+function geoCode(locations) {
+  var heatmapData = [];
+  var geocoder = new google.maps.Geocoder();
+  locations.forEach(function(address){
+    geocoder.geocode({'address' : address}, function(results, status){
+      if (status === "OK") {
+        var coords = results[0].geometry.location;
+        heatmapData.push(coords);
+      } else {
+        console.log("Geocode was not successful for the following reason: " + status);
+      }
+    });
+  });
+  return heatmapData;
+}
+
+function getLocation (locations){
   var portland = {lat: 45.52, lng: -122.67};
-  var map = new google.maps.Map(document.getElementById('map'), {
+  map = new google.maps.Map(document.getElementById('map'), {
     zoom: 8,
     center: portland,
     mapTypeId: "terrain"
   });
   var geocoder = new google.maps.Geocoder();
-  location.forEach(function(address){
-    console.log(address);
+  locations.forEach(function(address){
     geocoder.geocode({'address' : address}, function(results, status){
-      if (status =="OK") {
+      if (status === "OK") {
         var marker = new google.maps.Marker({
           position: results[0].geometry.location,
           map: map
@@ -127,8 +172,16 @@ var getLocation = function(location){
       }
     });
   });
-
 };
+
+function heatMap(locations){
+  var heatmap = new google.maps.visualization.HeatmapLayer({
+    data: geoCode(locations),
+    dissipating: false,
+    map: map
+  });
+
+}
 
 $(document).ready(function(){
   $("form#search-form").submit(function(event){
@@ -142,6 +195,9 @@ $(document).ready(function(){
     var Bikes = new Bike(manufacturer, color, location, distance, stolenness);
 
     Bikes.getBikeLocation(Bikes.Manufacturer, Bikes.Color, Bikes.Location, Bikes.Distance, Bikes.Stolenness, getLocation);
+    $("#heatmap").click(function(){
+      Bikes.displayHeatMap(Bikes.Manufacturer, Bikes.Color, Bikes.Location, Bikes.Distance, Bikes.Stolenness, heatMap)
+    });
   });
 });
 
