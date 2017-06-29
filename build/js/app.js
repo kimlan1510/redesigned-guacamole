@@ -42,11 +42,9 @@ Bike.prototype.getBikes = function(manufacturer, color, location, distance, stol
     bikes.forEach(function(element){
       displayInfo(element.title, element.serial, element.manufacturer_name);
     });
-    console.log("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike");
   })
   .fail(function(error){
     $("#display").text("No such thing");
-    console.log("https://bikeindex.org:443/api/v3/search?page=1&per_page=25" + stringManu + manufacturer + stringColor + color + stringLoc + location + stringDist + distance + "&stolenness=" + stolenness + "&access_token=bike");
   });
 };
 

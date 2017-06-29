@@ -23,5 +23,13 @@
   },
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kimlan1510/redesigned-guacamole.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kimlan1510/redesigned-guacamole/issues"
+  },
+  "homepage": "https://github.com/kimlan1510/redesigned-guacamole#readme",
   "description": ""
 }
